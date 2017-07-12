@@ -28,6 +28,7 @@ const javascript = {
 const postcss = {
   loader: 'postcss-loader',
   options: {
+    sourceMap: true,
     plugins() { return [autoprefixer({ browsers: 'last 3 versions' })]; }
   }
 };

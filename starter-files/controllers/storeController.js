@@ -51,6 +51,16 @@ exports.getStore = async (req, res) => {
   res.render('stores', { title: 'Stores', stores})
 }
 
+exports.getOneStore = async (req, res) => {
+  let key = Object.keys(req.params)[0]
+  const value = req.params[key]
+  if(key === 'id') key = '_id'
+  let query = {}
+  query[key] = value
+  const store = await Store.findOne(query)
+  res.render('store', { title: `${store.name}`, store})
+}
+
 exports.editStore = async (req, res) => {
   const store = await Store.findOne( { _id: req.params.id })
   res.render('editStore', { title: `Edit ${store.name}`, store})
@@ -63,4 +73,13 @@ exports.updateStore = async (req, res) => {
   }).exec()
   req.flash('success', `Successfully updated <strong>${store.name}</strong>. <a href='/stores/${store.slug}'>View Store </a>`)
   res.redirect(`/stores/${store._id}/edit`)
+}
+
+exports.getStoresByTag = async (req, res) => {
+  const tag = req.params.tag
+  const tagQuery = tag || { $exists: true }
+  const tagsPromise = Store.getTagsList()
+  const storesPromise = Store.find({ tags: tagQuery})
+  const [tags, stores] = await Promise.all([tagsPromise, storesPromise])
+  res.render('tag', { title: 'Tags', tag, tags, stores })
 }
